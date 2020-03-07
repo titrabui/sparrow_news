@@ -22,6 +22,9 @@ const app = {
     isSignedIn (state) {
       return state.signedIn
     },
+    csrfToken (state) {
+      return state.csrf
+    },
     // temp
     postManageUserId (state) {
       return state.postManageUserId

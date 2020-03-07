@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import SignForm from './SignForm'
 
 export default {
@@ -61,19 +61,22 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      unsetCurrentUser: 'app/unsetCurrentUser'
+    }),
     setError (error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text
     },
     signOut () {
       this.$http.secured.delete('/signin')
         .then(response => {
-          this.$store.commit('unsetCurrentUser')
+          this.unsetCurrentUser()
           this.$router.replace('/')
         })
         .catch(error => this.setError(error, 'Cannot sign out'))
     },
     showAdminLink () {
-      return this.$store.getters.isAdmin || this.$store.getters.isManager
+      return this.isAdmin || this.isManager
     },
     redirectToPage (route) {
       this.$router.replace(`/${route}`)

@@ -99,7 +99,7 @@ export default {
         .catch(error => this.setError(error, 'Cannot save changes'))
     },
     ...mapActions({
-      updateCurrentUser: 'updateCurrentUser'
+      updateCurrentUser: 'app/updateCurrentUser'
     })
   }
 }

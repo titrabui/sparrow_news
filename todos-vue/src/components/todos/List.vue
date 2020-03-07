@@ -29,8 +29,15 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'List',
+  computed: {
+    ...mapGetters({
+      isSignedIn: 'isSignedIn'
+    })
+  },
   data () {
     return {
       todos: [],
@@ -40,7 +47,7 @@ export default {
     }
   },
   created () {
-    if (!this.$store.state.signedIn) {
+    if (!this.isSignedIn) {
       this.$router.replace('/')
     } else {
       this.$http.secured.get('/todos')
@@ -78,12 +85,6 @@ export default {
       this.editedTodo = ''
       this.$http.secured.patch(`/todos/${todo.id}`, { todo: { title: todo.title } })
         .catch(error => this.setError(error, 'Cannot update todo'))
-    },
-    signOut () {
-      this.$http.secured.delete('/signin').then(response => {
-        this.$store.commit('unsetCurrentUser')
-        this.$router.replace('/')
-      }).catch(error => this.setError(error, 'Cannot sign out'))
     }
   },
   directives: {

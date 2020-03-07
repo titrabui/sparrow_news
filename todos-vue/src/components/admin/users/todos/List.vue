@@ -24,8 +24,16 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'UserTodosList',
+  computed: {
+    ...mapGetters({
+      isSignedIn: 'isSignedIn',
+      isAdmin: 'isAdmin'
+    })
+  },
   data () {
     return {
       error: '',
@@ -33,7 +41,7 @@ export default {
     }
   },
   created () {
-    if (this.$store.state.signedIn && this.$store.getters.isAdmin) {
+    if (this.isSignedIn && this.isAdmin) {
       this.$http.secured.get(`/admin/users/${this.$route.params.id}/todos`)
         .then(response => { this.todos = response.data })
         .catch(error => { this.setError(error, 'Something went wrong') })

@@ -46,6 +46,9 @@
 </template>
 
 <script>
+
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'SignForm',
   props: {
@@ -53,6 +56,11 @@ export default {
       type: String,
       default: () => 'in'
     }
+  },
+  computed: {
+    ...mapGetters({
+      isSignedIn: 'isSignedIn'
+    })
   },
   data () {
     return {
@@ -70,6 +78,10 @@ export default {
     this.checkSignedIn()
   },
   methods: {
+    ...mapActions({
+      setCurrentUser: 'app/setCurrentUser',
+      unsetCurrentUser: 'app/unsetCurrentUser'
+    }),
     signin () {
       this.$http.plain.post('/signin', { email: this.email, password: this.password })
         .then(response => this.signSuccessful(response))
@@ -88,7 +100,7 @@ export default {
 
       this.dialogVisible = false
       this.$http.plain.get('/me').then(meResponse => {
-        this.$store.commit('setCurrentUser', { currentUser: meResponse.data, csrf: response.data.csrf })
+        this.setCurrentUser({ currentUser: meResponse.data, csrf: response.data.csrf })
         this.error = ''
         this.$router.replace('/')
         this.$notify({
@@ -101,10 +113,10 @@ export default {
     },
     signFailed (error) {
       this.error = (error.response && error.response.data && error.response.data.error) || 'Something went wrong'
-      this.$store.commit('unsetCurrentUser')
+      this.unsetCurrentUser()
     },
     checkSignedIn () {
-      if (this.$store.state.signedIn) {
+      if (this.isSignedIn) {
         this.$router.replace('/')
       }
     },
