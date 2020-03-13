@@ -18,6 +18,7 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
 import AppHeader from '@/components/AppHeader'
 import AppSideBar from '@/components/AppSideBar'
 
@@ -27,9 +28,15 @@ export default {
     AppHeader,
     AppSideBar
   },
+  computed: {
+    ...mapGetters({
+      isAdmin: 'isAdmin',
+      isManager: 'isManager'
+    })
+  },
   methods: {
     showSideBarMenu () {
-      return this.$store.getters.isAdmin || this.$store.getters.isManager
+      return this.isAdmin || this.isManager
     }
   }
 }

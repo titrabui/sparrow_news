@@ -15,30 +15,24 @@
           )
         el-row(style="padding: 14px 20px")
           el-table(:data="posts.filter(data => !search || data.title.toLowerCase().includes(search.toLowerCase())).slice((currentPage - 1) * pageSize, (currentPage - 1) * pageSize + pageSize)" style="width: 100%" empty-text="No data")
-            el-table-column(type="expand")
-              template(slot-scope="props")
-                p(v-html="props.row.description")
+            el-table-column(type="expand" v-slot="{ row }")
+              p(v-html="row.description")
             el-table-column(label="News ID" prop="id" width="80")
-            el-table-column(label="Image" width="80")
-              template(slot-scope="scope")
-                img(:src="scope.row.image_url" style="width: 100%")
+            el-table-column(v-slot="{ row }" label="Image" width="80")
+              img(:src="row.image_url" style="width: 100%")
             el-table-column(label="Title" prop="title" width="400")
             el-table-column(label="Sub Title" prop="sub_title" width="400")
-            el-table-column(label="Comments" align="right" width="100")
-              template(slot-scope="scope")
-                span {{ (scope.row.comments && scope.row.comments.length) || 0 }}
-            el-table-column(label="Author" min-width="150")
-              template(slot-scope="scope")
-                span {{ scope.row.user.email }}
-            el-table-column(label="Created At" width="150")
-              template(slot-scope="scope")
-                span {{ createdAt(scope.row.created_at) }}
-            el-table-column(fixed="right" label="Operations" width="120")
-              template(slot-scope="scope")
-                el-tooltip(content="Edit")
-                  el-button(@click="editPost(scope.row.id)" type="warning" icon="el-icon-edit" circle)
-                el-tooltip(content="Delete")
-                  el-button(@click="deletePost(scope.row.id)" type="danger" icon="el-icon-delete" circle)
+            el-table-column(v-slot="{ row }" label="Comments" align="right" width="100")
+              span {{ (row.comments && row.comments.length) || 0 }}
+            el-table-column(v-slot="{ row }" label="Author" min-width="150")
+                span {{ row.user ? row.user.email : '-' }}
+            el-table-column(v-slot="{ row }" label="Created At" width="150")
+              span {{ createdAt(row.created_at) }}
+            el-table-column(v-slot="{ row }" fixed="right" label="Operations" width="120")
+              el-tooltip(content="Edit")
+                el-button(@click="editPost(row.id)" type="warning" icon="el-icon-edit" circle)
+              el-tooltip(content="Delete")
+                el-button(@click="deletePost(row.id)" type="danger" icon="el-icon-delete" circle)
         el-row(style="padding: 14px 20px; text-align: center;")
           el-pagination(
             background

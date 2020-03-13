@@ -46,6 +46,9 @@
 </template>
 
 <script>
+
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'SignForm',
   props: {
@@ -53,6 +56,11 @@ export default {
       type: String,
       default: () => 'in'
     }
+  },
+  computed: {
+    ...mapGetters({
+      isSignedIn: 'isSignedIn'
+    })
   },
   data () {
     return {
@@ -63,13 +71,11 @@ export default {
       dialogVisible: false
     }
   },
-  created () {
-    this.checkSignedIn()
-  },
-  updated () {
-    this.checkSignedIn()
-  },
   methods: {
+    ...mapActions({
+      setCurrentUser: 'setCurrentUser',
+      unsetCurrentUser: 'unsetCurrentUser'
+    }),
     signin () {
       this.$http.plain.post('/signin', { email: this.email, password: this.password })
         .then(response => this.signSuccessful(response))
@@ -80,33 +86,30 @@ export default {
         .then(response => this.signSuccessful(response))
         .catch(error => this.signFailed(error))
     },
-    signSuccessful (response) {
+    async signSuccessful (response) {
       if (!response.data.csrf) {
         this.signFailed(response)
         return
       }
 
       this.dialogVisible = false
-      this.$http.plain.get('/me').then(meResponse => {
-        this.$store.commit('setCurrentUser', { currentUser: meResponse.data, csrf: response.data.csrf })
+      try {
+        const meResponse = await this.$http.plain.get('/me')
+        this.setCurrentUser({ currentUser: meResponse.data, csrf: response.data.csrf })
         this.error = ''
-        this.$router.replace('/')
         this.$notify({
           title: `Sign ${this.signType} successful`,
           message: `You ${this.signType === 'up' ? 'signed up and' : ''} loged in successful`,
           type: 'success',
           duration: 2000
         })
-      }).catch(error => this.signFailed(error))
+      } catch (error) {
+        this.signFailed(error)
+      }
     },
     signFailed (error) {
       this.error = (error.response && error.response.data && error.response.data.error) || 'Something went wrong'
-      this.$store.commit('unsetCurrentUser')
-    },
-    checkSignedIn () {
-      if (this.$store.state.signedIn) {
-        this.$router.replace('/')
-      }
+      this.unsetCurrentUser()
     },
     authorizationCode (authCode, provider) {
       this.$http.plain.post(`/oauth/${provider}`, { auth_code: authCode, provider: provider })
