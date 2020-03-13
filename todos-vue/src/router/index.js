@@ -54,7 +54,7 @@ const router = new Router({
       path: '/admin/users/:id',
       name: 'UserEdit',
       component: UserEdit,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, roles: ['admin', 'manager'] }
     },
     {
       path: '/',

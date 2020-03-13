@@ -50,6 +50,12 @@ const app = {
     }
   },
   actions: {
+    setCurrentUser ({ commit }, { currentUser, csrf }) {
+      commit('setCurrentUser', { currentUser, csrf })
+    },
+    unsetCurrentUser ({ commit }) {
+      commit('unsetCurrentUser')
+    },
     updateCurrentUser ({ commit }, currentUser) {
       commit('updateCurrentUser', currentUser)
     }

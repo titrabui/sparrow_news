@@ -63,19 +63,15 @@ export default {
       this.notice = ''
     },
     checkSignedIn () {
-      if (this.isSignedIn && this.isAdmin) {
-        this.$http.secured.get(`/admin/users/${this.$route.params.id}`)
-          .then(response => {
-            if (this.currentUserId === response.data.id) {
-              this.$router.replace('/')
-              return
-            }
-            this.user = response.data
-          })
-          .catch(error => { this.setError(error, 'Something went wrong') })
-      } else {
-        this.$router.replace('/')
-      }
+      this.$http.secured.get(`/admin/users/${this.$route.params.id}`)
+        .then(response => {
+          if (this.currentUserId === response.data.id) {
+            this.$router.replace('/')
+            return
+          }
+          this.user = response.data
+        })
+        .catch(error => { this.setError(error, 'Something went wrong') })
     }
   }
 }

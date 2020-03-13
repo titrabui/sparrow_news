@@ -15,55 +15,45 @@
       el-row(style="padding: 14px 20px")
         el-table(:data="users.filter(data => !search || data.email.toLowerCase().includes(search.toLowerCase())).slice((currentPage - 1) * pageSize, (currentPage - 1) * pageSize + pageSize)" style="width: 100%" empty-text="No data")
           el-table-column(label="User ID" prop="id" width="80")
-          el-table-column(label="Avatar" width="80" align="center")
-            template(slot-scope="scope")
-              el-popover(
-                placement="top-start"
-                width="200"
-                trigger="hover"
-                :disabled="scope.row.avatar.url === null"
-                popper-class="avatar-popover")
-                el-avatar(:src="scope.row.avatar.url" :size="200" shape="square")
-                el-avatar(v-if="scope.row.avatar.url" slot="reference" :src="scope.row.avatar.url" :size="40" shape="square")
-                el-avatar(v-else slot="reference" :size="40" shape="square") {{ scope.row.email.charAt(0).toUpperCase() }}
-          el-table-column(label="Status" width="80" align="center")
-            template(slot-scope="scope")
-              el-tooltip(:content="scope.row.content_visibility ? 'Active' : 'Deactive'")
-                el-switch(v-model="scope.row.content_visibility" active-color="#13ce66" inactive-color="#ff4949")
+          el-table-column(label="Avatar" width="80" align="center" v-slot="{ row }")
+            el-popover(
+              placement="top-start"
+              width="200"
+              trigger="hover"
+              :disabled="row.avatar.url === null"
+              popper-class="avatar-popover")
+              el-avatar(:src="row.avatar.url" :size="200" shape="square")
+              el-avatar(v-if="row.avatar.url" slot="reference" :src="row.avatar.url" :size="40" shape="square")
+              el-avatar(v-else slot="reference" :size="40" shape="square") {{ row.email.charAt(0).toUpperCase() }}
+          el-table-column(label="Status" width="80" align="center" v-slot="{ row }")
+            el-tooltip(:content="row.content_visibility ? 'Active' : 'Deactive'")
+              el-switch(v-model="row.content_visibility" active-color="#13ce66" inactive-color="#ff4949")
           el-table-column(label="Email" prop="email" min-width="200")
-          el-table-column(label="Display name" min-width="200")
-            template(slot-scope="scope")
-              span {{ scope.row.display_name || '-' }}
-          el-table-column(label="Role" prop="role" min-width="100")
-            template(slot-scope="scope")
-              el-select(v-if="isAdmin" v-model="scope.row.role" @change="changeUserRole(scope.row.id, $event)" @focus="backupRole($event)")
-                el-option(
-                  v-for="item in userRoles"
-                  :key="item"
-                  :label="item"
-                  :value="item")
-              span(v-if="isManager") {{ scope.row.role }}
-          el-table-column(label="Posts" align="right" min-width="100")
-            template(slot-scope="scope")
-              span {{ scope.row.posts }}
-          el-table-column(label="Comments" align="right" min-width="100")
-            template(slot-scope="scope")
-              span {{ scope.row.comments }}
-          el-table-column(label="Birthday" min-width="150" align="right")
-            template(slot-scope="scope")
-              span {{ (scope.row.birthday && birthday(scope.row.birthday)) || '-' }}
-          el-table-column(label="About" min-width="200")
-            template(slot-scope="scope")
-              span {{ scope.row.about || '-' }}
-          el-table-column(label="Registered at" min-width="150" align="right")
-            template(slot-scope="scope")
-              span {{ createdAt(scope.row.created_at) }}
-          el-table-column(fixed="right" label="Operations" width="120" :align="isManager ? 'center' : 'left'")
-            template(slot-scope="scope")
-              el-tooltip(content="View News")
-                el-button(@click="viewUserPost(scope.row.id)" type="success" icon="el-icon-news" circle)
-              el-tooltip(content="Delete")
-                el-button(v-if="canDeleteUser(scope.row.id)" @click="removeUser(scope.row.id)" type="danger" icon="el-icon-delete" circle)
+          el-table-column(label="Display name" min-width="200" v-slot="{ row }")
+            span {{ row.display_name || '-' }}
+          el-table-column(label="Role" prop="role" min-width="100" v-slot="{ row }")
+            el-select(v-if="isAdmin" v-model="row.role" @change="changeUserRole(row.id, $event)" @focus="backupRole($event)")
+              el-option(
+                v-for="item in userRoles"
+                :key="item"
+                :label="item"
+                :value="item")
+            span(v-if="isManager") {{ row.role }}
+          el-table-column(label="Posts" align="right" min-width="100" v-slot="{ row }")
+            span {{ row.posts }}
+          el-table-column(label="Comments" align="right" min-width="100" v-slot="{ row }")
+            span {{ row.comments }}
+          el-table-column(label="Birthday" min-width="150" align="right" v-slot="{ row }")
+            span {{ (row.birthday && birthday(row.birthday)) || '-' }}
+          el-table-column(label="About" min-width="200" v-slot="{ row }")
+            span {{ row.about || '-' }}
+          el-table-column(label="Registered at" min-width="150" align="right" v-slot="{ row }")
+            span {{ createdAt(row.created_at) }}
+          el-table-column(fixed="right" label="Operations" width="120" :align="isManager ? 'center' : 'left'" v-slot="{ row }")
+            el-tooltip(content="View News")
+              el-button(@click="viewUserPost(row.id)" type="success" icon="el-icon-news" circle)
+            el-tooltip(content="Delete")
+              el-button(v-if="canDeleteUser(row.id)" @click="removeUser(row.id)" type="danger" icon="el-icon-delete" circle)
       el-row(style="padding: 14px 20px; text-align: center;")
         el-pagination(
           background

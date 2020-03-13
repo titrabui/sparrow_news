@@ -62,18 +62,19 @@ export default {
   },
   methods: {
     ...mapActions({
-      unsetCurrentUser: 'app/unsetCurrentUser'
+      unsetCurrentUser: 'unsetCurrentUser'
     }),
     setError (error, text) {
       this.error = (error.response && error.response.data && error.response.data.error) || text
     },
-    signOut () {
-      this.$http.secured.delete('/signin')
-        .then(response => {
-          this.unsetCurrentUser()
-          this.$router.replace('/')
-        })
-        .catch(error => this.setError(error, 'Cannot sign out'))
+    async signOut () {
+      try {
+        await this.$http.secured.delete('/signin')
+        this.unsetCurrentUser()
+        if (this.$route.path !== '/') this.$router.replace('/')
+      } catch (error) {
+        this.setError(error, 'Cannot sign out')
+      }
     },
     showAdminLink () {
       return this.isAdmin || this.isManager
